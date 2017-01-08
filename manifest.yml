@@ -4,5 +4,5 @@ applications:
   instances: 1
   domain: mybluemix.net
   name: watsonwork-echo
-  host: SCSocket
-  disk_quota: watsonwork-echo
+  host: watsonwork-echo
+  disk_quota: 1024M
