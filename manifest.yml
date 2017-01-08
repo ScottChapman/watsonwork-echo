@@ -3,6 +3,6 @@ applications:
   memory: 1024M
   instances: 1
   domain: mybluemix.net
-  name: watsonwork-echo
-  host: watsonwork-echo
+  name: scwatsonwork-echo
+  host: scwatsonwork-echo
   disk_quota: 1024M
