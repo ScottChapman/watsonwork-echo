@@ -146,6 +146,9 @@ export const webapp = (appId, secret, wsecret, cb) => {
 // App main entry point
 const main = (argv, env, cb) => {
   // Create Express Web app
+  log("ECHO_APP_ID: %s", env.ECHO_APP_ID);
+  log("ECHO_APP_SECRET: %s", env.ECHO_APP_SECRET);
+  log("ECHO_WEBHOOK_SECRET: %s", env.ECHO_WEBHOOK_SECRET);
   webapp(
     env.ECHO_APP_ID, env.ECHO_APP_SECRET,
     env.ECHO_WEBHOOK_SECRET, (err, app) => {
@@ -184,4 +187,3 @@ if (require.main === module)
     }
     log('App started');
   });
-
