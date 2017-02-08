@@ -6,3 +6,4 @@ applications:
   name: scwatsonwork-echo
   host: scwatsonwork-echo
   disk_quota: 2G
+  command: node lib/app.js
