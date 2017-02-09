@@ -11,6 +11,7 @@ import * as https from 'https';
 import * as oauth from './oauth';
 import * as ssl from './ssl';
 import debug from 'debug';
+import * as io from 'socket.io';
 
 // Debug log
 const log = debug('watsonwork-echo-app');
@@ -120,6 +121,18 @@ const app = express();
 // serve the files out of ./public as our main files
 app.use(express.static(__dirname + "/public"));
 
+app.get("/webhook", function(req, res) {
+	fs.readFile(__dirname + "/public/webhook.html", 'utf-8', function(err, data) {
+    if (err) {
+      console.log("Error:" + err);
+      res.writeHead(500);
+      return res.end("Error loading webhook-event-log.html");
+    }
+    res.writeHead(200);
+    res.end(data);
+  });
+});
+
 // Create Express Web app
 export const webapp = (appId, secret, wsecret, cb) => {
   // Authenticate the app and get an OAuth token
@@ -168,7 +181,7 @@ const main = (argv, env, cb) => {
         // handled by a reverse proxy in front of the app, just listen
         // on the configured HTTP port
         log('HTTP server listening on port %d', env.PORT);
-        http.createServer(app).listen(env.PORT, cb);
+        io.listen(http.createServer(app).listen(env.PORT, cb));
       }
 
       else

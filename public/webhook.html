@@ -1,0 +1,53 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Toscana Webhook Event Log</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="stylesheets/style.css">
+  </head>
+  <body>
+    <h1>Toscana Webhook Event Log</h1>
+    <p class = "blue"><time></time></p>
+    <p><span class="latency">latency</span>: the time between the internal event time (event created) and the time when the event is received in the callback and logged.</p>
+    <h2>Received webhook events:</h2>
+    <div><ul  id="logs"></ul></div>
+    <script src="socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script>
+      var socketUrl = window.location.protocol + '//' + window.location.host;
+      // creating a new websocket
+      var socket = io.connect( socketUrl );
+
+      function formatDate(date) {
+      	return date.getMonth() + "/" + date.getDate() + "/" + date.getFullYear() + ", " +
+      		date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds() + "." + date.getMilliseconds();
+      }
+
+      // on every notification (new received outboud request event) we update the log
+      socket.on('webhook-event', function (data) {
+        var body = data.body;
+        if (body.annotationPayload) {
+          body.annotationPayload = JSON.parse(body.annotationPayload)
+        }
+        var d = new Date(body.time);
+        var currentDate = new Date();
+        var latency = (currentDate - body.time) / 1000;
+        body.time = formatDate(d);
+        var text = '*** Type: ' + body.type + ' *** ' +
+          '<br/>Time: ' + formatDate(currentDate) +
+          '<br/>Latency: ' + latency.toFixed(3) + " seconds." +
+          '<br/>' + ' Payload: <pre>' + JSON.stringify(body,null,'    ') + '</pre>' + "<br/>";
+        // convert the json string into a valid javascript object
+        //var _data = JSON.parse(data);
+        $('time').html('Last Update:' + new Date());
+
+        var node = document.getElementById("logs");
+        var newNode = document.createElement("li");
+        newNode.innerHTML = text;
+        node.insertBefore(newNode, node.firstChild);
+      });
+    </script>
+  </body>
+</html>
