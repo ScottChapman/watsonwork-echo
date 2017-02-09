@@ -71,8 +71,8 @@ const send = (spaceId, text, tok, cb) => {
           text: text,
 
           actor: {
-            name: 'from sample echo app',
-            avatar: 'https://avatars1.githubusercontent.com/u/22985179',
+            name: 'HealthCare Bot',
+            avatar: 'https://scwatsonwork-echo.mybluemix.net/public/bot.png',
             url: 'https://github.com/watsonwork/watsonwork-echo'
           }
         }]
@@ -114,6 +114,12 @@ export const challenge = (wsecret) => (req, res, next) => {
   next();
 };
 
+// Create Express App
+const app = express();
+
+// serve the files out of ./public as our main files
+app.use(express.static(__dirname + "/public"));
+
 // Create Express Web app
 export const webapp = (appId, secret, wsecret, cb) => {
   // Authenticate the app and get an OAuth token
@@ -124,7 +130,7 @@ export const webapp = (appId, secret, wsecret, cb) => {
     }
 
     // Return the Express Web app
-    cb(null, express()
+    cb(null, app
 
       // Configure Express route for the app Webhook
       .post('/echo',
