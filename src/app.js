@@ -11,7 +11,10 @@ import * as https from 'https';
 import * as oauth from './oauth';
 import * as ssl from './ssl';
 import debug from 'debug';
-import * as io from 'socket.io';
+import * as path from 'path';
+import * as socket from 'socket.io';
+import * as fs from 'fs';
+var io;
 
 // Debug log
 const log = debug('watsonwork-echo-app');
@@ -23,9 +26,11 @@ export const echo = (appId, token) => (req, res) => {
   // be sent asynchronously
   res.status(201).end();
 
+	io.sockets.emit('webhook-event', {eventTime: new Date(), body: req.body});
+
   // Only handle message-created Webhook events, and ignore the app's
   // own messages
-  if(req.body.type !== 'message-created' || req.body.userId === appId)
+  if(req.body.type !== 'message-created') || req.body.userId === appId)
     return;
 
   log('Got a message %o', req.body);
@@ -72,8 +77,8 @@ const send = (spaceId, text, tok, cb) => {
           text: text,
 
           actor: {
-            name: 'HealthCare Bot',
-            avatar: 'https://scwatsonwork-echo.mybluemix.net/public/bot.png',
+            name: 'HealthCare Bot V1.0',
+            avatar: 'https://scwatsonwork-echo.mybluemix.net/bot.png',
             url: 'https://github.com/watsonwork/watsonwork-echo'
           }
         }]
@@ -119,10 +124,11 @@ export const challenge = (wsecret) => (req, res, next) => {
 const app = express();
 
 // serve the files out of ./public as our main files
-app.use(express.static(__dirname + "/public"));
+app.use(express.static(path.dirname(__dirname) + "/public"));
+log("Using path: " + path.dirname(__dirname) + "/public");
 
 app.get("/webhook", function(req, res) {
-	fs.readFile(__dirname + "/public/webhook.html", 'utf-8', function(err, data) {
+	fs.readFile(path.dirname(__dirname) + "/public/webhook.html", 'utf-8', function(err, data) {
     if (err) {
       console.log("Error:" + err);
       res.writeHead(500);
@@ -181,7 +187,7 @@ const main = (argv, env, cb) => {
         // handled by a reverse proxy in front of the app, just listen
         // on the configured HTTP port
         log('HTTP server listening on port %d', env.PORT);
-        io.listen(http.createServer(app).listen(env.PORT, cb));
+        io = socket.listen(http.createServer(app).listen(env.PORT, cb));
       }
 
       else
