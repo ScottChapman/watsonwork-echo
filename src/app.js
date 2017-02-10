@@ -30,7 +30,7 @@ export const echo = (appId, token) => (req, res) => {
 
   // Only handle message-created Webhook events, and ignore the app's
   // own messages
-  if(req.body.type !== 'message-created') || req.body.userId === appId)
+  if(req.body.type !== 'message-created' || req.body.userId === appId)
     return;
 
   log('Got a message %o', req.body);
